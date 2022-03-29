@@ -1,0 +1,21 @@
+{
+  "name": "otp-test",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages\\back",
+    "packages\\front"
+  ],
+  "scripts": {
+    "migrate": "cd packages\\back\\src && knex migrate:latest && knex seed:run",
+    "dev:back": "cd packages\\back && npm run dev",
+    "build:back": "cd packages\\back && npm run build",
+    "dev:front": "cd packages\\front && npm run dev",
+    "build:front": "cd packages\\front && npm run build",
+    "dev": "concurrently \"npm run dev:back\" \"npm run dev:front\"",
+    "build": "concurrently \"npm run build:back\" \"npm run build:front\""
+  },
+  "dependencies": {
+    "concurrently": "^7.0.0"
+  }
+}
