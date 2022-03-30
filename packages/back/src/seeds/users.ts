@@ -10,5 +10,5 @@ export async function seed(knex: Knex): Promise<void> {
   await knex('users').del()
 
   // Inserts seed entries
-  await knex('users').insert(fakeUsers)
+  await knex('users').insert([...fakeUsers, { id: 'test1', name: 'test1' }])
 }

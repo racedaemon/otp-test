@@ -1,10 +1,36 @@
-import knex from './database'
+import knex from '../database'
 import { FastifyInstance, FastifyPluginOptions } from 'fastify'
 import crypto from 'crypto'
 
 const interval = 30
 
 export default function (fastify: FastifyInstance, opts: FastifyPluginOptions, done: (err?: Error | undefined) => void) {
+  fastify.get('/users', {
+    schema: {
+      response: {
+        200: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              user_id: {
+                type: 'string'
+              },
+              name: {
+                type: 'string'
+              },
+            }
+          }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    const result = await knex<{ user_id: string, name: string }>('users')
+      .select('id AS user_id', 'name')
+
+    reply.code(200).send(result)
+  })
+
   fastify.post<{ Body: { UserId: string, DateTime: string } }>('/users/generate_otp', {
     schema: {
       response: {
@@ -29,6 +55,12 @@ export default function (fastify: FastifyInstance, opts: FastifyPluginOptions, d
     }
   }, async (request, reply) => {
     const { UserId, DateTime } = request.body
+    if (await knex('users').where({ id: UserId }).first() === undefined) {
+      reply.code(401).send({
+        UserId,
+        Error: true
+      })
+    }
 
     const lastCode = await knex<{ user_id: string, start_timestamp: string }>('otps')
       .where({ user_id: UserId }).orderBy('start_timestamp', 'desc').first()
@@ -54,32 +86,6 @@ export default function (fastify: FastifyInstance, opts: FastifyPluginOptions, d
       })
     }
 
-  })
-
-  fastify.get('/users', {
-    schema: {
-      response: {
-        200: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              user_id: {
-                type: 'string'
-              },
-              name: {
-                type: 'string'
-              },
-            }
-          }
-        }
-      }
-    }
-  }, async (request, reply) => {
-    const result = await knex<{ user_id: string, name: string }>('users')
-      .select('id AS user_id', 'name')
-
-    reply.code(200).send(result)
   })
 
   fastify.post<{ Body: { UserId: string, Code: string } }>('/users/check_otp', {

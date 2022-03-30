@@ -6,8 +6,11 @@
       <option v-for="user in users" :value="user.user_id" v-text="user.name" />
     </select>
     <input type="text" v-model="code" class="border-gray-200 border rounded-md h-14 px-2 focus-within:ring-2 focus-within:ring-orange-400 ml-2 w-20 appearance-none focus:outline-none text-center font-bold">
-    <button @click="checkPassword" :class="checkBg" class="ml-2 h-14 px-2 rounded-md text-white font-light border-yellow-400 hover:-hue-rotate-30  focus:ring-orange-400 focus:ring-offset-lime-500 focus:ring-2">
+    <button @click="checkPassword" class="bg-bt-yellow ml-2 h-14 px-2 rounded-md text-white font-light border-yellow-400 hover:-hue-rotate-30  focus:ring-orange-400 focus:ring-offset-lime-500 focus:ring-2">
       <span>Check</span>
+      <div class="self-center">
+        <span class="material-icons" :class="check.color">{{check.icon}}</span>
+      </div>
     </button>
   </div>
   </div>
@@ -18,15 +21,15 @@ export default {
   name: 'PasswordCheck',
   props: ['users'],
   computed: {
-    checkBg() {
+    check() {
       console.log('check')
       switch (this.result) {
         case true:
-          return 'bg-lime-400'
+          return { color: 'text-lime-400', icon: 'check_circle_outline'}
         case false:
-          return 'bg-red-400'
+          return { color: 'text-red-400', icon: 'highlight_off'}
         default:
-          return 'bg-bt-yellow'
+          return { color: 'text-bt-yellow', icon: 'panorama_fish_eye'}
       }
     }
   },
